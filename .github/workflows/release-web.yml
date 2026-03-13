@@ -23,10 +23,6 @@ jobs:
           with:
             flutter-version: '3.27.1'
             channel: 'stable'
-        - name: List files in the repository
-          run: |
-            echo '' > ${{ secrets.OASX_RELEASE }}
-            ls ${{ github.workspace }}
         - run: echo "🍏 This job's status is ${{ job.status }}."
         - run: flutter --version
         - name: "Read file contents"
