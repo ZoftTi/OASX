@@ -31,7 +31,15 @@ class LoginController extends GetxController {
   }
 
   Future<void> login(String address) async {
-    ApiClient().setAddress('http://$address');
+    address = address.trim();
+
+    // 没协议就加 http
+    if (!address.contains('://')) {
+      address = 'http://$address';
+    }
+
+    final uri = Uri.parse(address);
+    ApiClient().setAddress(uri.toString());
     if (await ApiClient().testAddress()) {
       Get.offAllNamed('/main');
     } else {

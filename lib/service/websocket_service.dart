@@ -15,19 +15,28 @@ class WebSocketService extends GetxService {
   /// listener(optional): webSocket message listener. it will add to ws listeners, message broadcast to all listeners
   /// force(optional): Although ws already opened, it will force connect to ws.Deal some ws problems(opened, but error)
   /// return: WebSocketClient. can send message
-  Future<WebSocketClient> connect(
-      {required String name,
-      String? url,
-      MessageListener? listener,
-      bool force = false}) async {
+  Future<WebSocketClient> connect({
+    required String name,
+    String? url,
+    MessageListener? listener,
+    bool force = false,
+  }) async {
     if (!force && _clients.containsKey(name)) {
       return _clients[name]!._addListener(listener);
     }
     if (force && _clients.containsKey(name)) {
       await close(name, reconnect: false);
     }
-
-    url ??= 'ws://${ApiClient().address}/ws/$name';
+    if (url == null) {
+      final baseUri = Uri.parse(ApiClient().address);
+      // http -> ws   https -> wss
+      final wsScheme = baseUri.scheme == 'https' ? 'wss' : 'ws';
+      final wsUri = baseUri.replace(
+        scheme: wsScheme,
+        path: '/ws/$name',
+      );
+      url = wsUri.toString();
+    }
     final client = WebSocketClient(
       name: name,
       url: url,
